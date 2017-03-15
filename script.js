@@ -1,5 +1,5 @@
 var canvas; var mousedown; var cursor; var colour;
-var freehand; var line; var rect;
+var freehand; var line; var rect; var square; var circ;
 var startPos;
 
 var shapeArray = [];
@@ -7,7 +7,9 @@ var shapeArray = [];
 $(document).ready(function(){
     
     canvas = document.getElementById("canvas");
-    freehand = false; line = false; rect = false; mousedown = false; colour = "#000000";
+    freehand = false; line = false; rect = false; square = false; circ = false;
+    mousedown = false; 
+    colour = "#000000";
     cursor = canvas.getContext("2d");
   
     $('#canvas').mousedown(function(e){
@@ -16,16 +18,12 @@ $(document).ready(function(){
         mousedown = true;
         
         //if shape is line, get starting coordinates
-        if (line || rect) {
+        if (line || rect || square || circ) {
             startPos = getMousePos(canvas);
         }
     });
     
     $('#canvas').mousemove(function(e){
-        if (mousedown) {
-            //var newShape = new shape(colour,cursor,getMousePos(canvas));
-            //newShape.draw();
-        }
     });
     
     $('#canvas').mouseup(function(e){
@@ -41,22 +39,38 @@ $(document).ready(function(){
         } else if (rect) {
             var newRect = new rectShape(colour,cursor,startPos,getMousePos(canvas));
             shapeArray.push(newRect);
+        //if shape is square
+        } else if (square) {
+            var newSquare = new squareShape(colour,cursor,startPos,getMousePos(canvas));
+            shapeArray.push(newSquare);
+        } else if (circ) {
+            var newCirc = new circShape(colour,cursor,startPos,getMousePos(canvas));
+            shapeArray.push(newCirc);
         }
+        //draw everything
         draw(canvas,cursor);
     });
     
     //MODE BUTTONS------------------------------
     
     $('#freehand').mousedown(function(e){
-        freehand = true; line = false; rect = false;
+        freehand = true; line = false; rect = false; square = false; circ = false;
     });
     
     $('#line').mousedown(function(e) {
-        freehand = false; line = true; rect = false;
+        freehand = false; line = true; rect = false; square = false; circ = false;
     });
     
     $('#rect').mousedown(function(e) {
-        freehand = false; line = false; rect = true;
+        freehand = false; line = false; rect = true; square = false; circ = false;
+    });
+    
+    $('#square').mousedown(function(e) {
+        freehand = false; line = false; rect = false; square = true; circ = false;
+    });
+    
+    $('#circ').mousedown(function(e) {
+        freehand = false; line = false; rect = false; square = false; circ = true;
     });
     
     //COLOUR BUTTONS------------------------------
@@ -76,6 +90,7 @@ $(document).ready(function(){
 });
 
 //FUNCS--------------------------------
+//finds mous position relative to canvas
 function getMousePos(canvas) {
     var rect = canvas.getBoundingClientRect();
     return {
