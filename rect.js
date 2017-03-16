@@ -3,7 +3,6 @@ function rectShape(colour, cursor,startPos, endPos) {
     this.colour=colour;
     this.startPos = startPos;
     this.endPos = endPos;
-    this.endPos = endPos;
 }
 
 rectShape.prototype = Object.create(shape.prototype);
