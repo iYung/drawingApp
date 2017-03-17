@@ -15,12 +15,21 @@ freehandShape.prototype.addPt = function(newPt) {
 freehandShape.prototype.draw = function() {
     this.cursor.fillStyle=this.colour;
     for (var i = 0; i < this.posArray.length; i++){
-        this.cursor.fillRect(this.posArray[i].x - 2,this.posArray[i].y - 2,4,4);
+        this.cursor.fillRect(this.posArray[i].x - 3,this.posArray[i].y - 3,7,7);
     }
 };
 
 freehandShape.prototype.hit = function(cursorPos) {
     for (var i = 0; i < this.posArray.length; i++){
-        this.cursor.fillRect(this.posArray[i].x - 2,this.posArray[i].y - 2,4,4);
+        if ((this.posArray[i].x - 3 < cursorPos.x) && (cursorPos.x < this.posArray[i].x + 3) && (this.posArray[i].y - 3 < cursorPos.y) && (cursorPos.y < this.posArray[i].y + 3)){
+            alert(i);
+            return true;
+        //if in rectangle drawn upwards
+        }else if ((this.posArray[i].x - 3 > cursorPos.x) && (cursorPos.x > this.posArray[i].x + 3) && (this.posArray[i].y - 3 > cursorPos.y) && (cursorPos.y > this.posArray[i].y + 3)){
+            alert(i);
+            return true;
+        }
     }
+    //not this square
+    return false;
 }

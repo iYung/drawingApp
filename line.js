@@ -15,3 +15,14 @@ lineShape.prototype.draw = function() {
     this.cursor.strokeStyle = this.colour;
     this.cursor.stroke();
 };
+
+lineShape.prototype.hit = function(cursorPos) {
+    //checks if on line
+    if (Math.sqrt((cursorPos.x - this.startPos.x)^2 + (cursorPos.y - this.startPos.y)^2) + Math.sqrt((cursorPos.x - this.endPos.x)^2 + (cursorPos.y - this.endPos.y)^2) == Math.sqrt((this.endPos.x - this.startPos.x)^2 + (this.endPos.y - this.startPos.y)^2)){
+        return true;
+    }
+    return false; 
+}
+
+
+
