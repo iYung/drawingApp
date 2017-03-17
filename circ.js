@@ -14,3 +14,17 @@ circShape.prototype.draw = function() {
     this.cursor.fillStyle=this.colour;
     this.cursor.fill();
 };
+
+circShape.prototype.hit = function(cursorPos) {
+    //if mouse is not in x axis
+    if ( Math.abs(cursorPos.x - (this.endPos.x + this.startPos.x) / 2) > ((this.endPos.x + this.startPos.x) / 2) - this.startPos.x ) {
+        return false;
+    //if mouse is not in y axis
+    }else if ( Math.abs(cursorPos.y - (this.endPos.y + this.startPos.y) / 2) > ((this.endPos.x + this.startPos.x) / 2) - this.startPos.x ) {
+        return false;
+    //if in circle
+    }else {
+        alert("");
+        return true;
+    }
+}

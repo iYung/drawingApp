@@ -12,3 +12,16 @@ rectShape.prototype.draw = function() {
     this.cursor.fillStyle=this.colour;
     this.cursor.fillRect(this.startPos.x,this.startPos.y,this.endPos.x - this.startPos.x,this.endPos.y - this.startPos.y);
 };
+
+rectShape.prototype.hit = function(cursorPos) {
+    //if in rectangle drawn downwards
+    if ((this.startPos.x < cursorPos.x) && (cursorPos.x < this.endPos.x) && (this.startPos.y < cursorPos.y) && (cursorPos.y < this.endPos.y)){
+        return true;
+    //if in rectangle drawn upwards
+    }else if ((this.startPos.x > cursorPos.x) && (cursorPos.x > this.endPos.x) && (this.startPos.y > cursorPos.y) && (cursorPos.y > this.endPos.y)){
+        return true;
+    //not in rectangle
+    }else {
+        return false;
+    }
+}

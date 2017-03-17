@@ -18,3 +18,9 @@ freehandShape.prototype.draw = function() {
         this.cursor.fillRect(this.posArray[i].x - 2,this.posArray[i].y - 2,4,4);
     }
 };
+
+freehandShape.prototype.hit = function(cursorPos) {
+    for (var i = 0; i < this.posArray.length; i++){
+        this.cursor.fillRect(this.posArray[i].x - 2,this.posArray[i].y - 2,4,4);
+    }
+}

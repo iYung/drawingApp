@@ -29,6 +29,11 @@ $(document).ready(function(){
             freehandObj = new freehandShape(colour,cursor,startPos);
         }
         
+        if (shapeArray[0] != null){
+            checkHit(getMousePos(canvas));
+        }
+        
+        
     });
     
     $('#canvas').mousemove(function(e){
@@ -133,5 +138,11 @@ function draw(canvas,cursor) {
     cursor.clearRect(0, 0, canvas.width, canvas.height);
     for (var i = 0; i < shapeArray.length; i++){
         shapeArray[i].draw();
+    }
+}
+
+function checkHit(mousePos){
+    for (var i = 0; i < shapeArray.length; i++){
+        shapeArray[i].hit(mousePos);
     }
 }
