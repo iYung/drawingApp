@@ -24,7 +24,6 @@ circShape.prototype.hit = function(cursorPos) {
         return false;
     //if in circle
     }else {
-        alert("");
         return true;
     }
 }

@@ -20,3 +20,15 @@ ellipShape.prototype.draw = function() {
     this.cursor.fillStyle=this.colour;
     this.cursor.fill();
 };
+
+ellipShape.prototype.hit = function(cursorPos) {
+    var dx = cursorPos.x - (this.endPos.x + this.startPos.x) / 2;
+    var dy = cursorPos.y - (this.endPos.y + this.startPos.y) / 2;
+    var xRad = (this.endPos.x + this.startPos.x) / 2 - this.startPos.x;
+    var yRad = (this.endPos.y + this.startPos.y) / 2 - this.startPos.y;
+    if (( dx * dx ) / ( xRad * xRad ) + ( dy * dy ) / ( yRad * yRad ) <= 1){
+        return true;
+    } else {
+        return false;
+    }
+}

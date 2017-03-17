@@ -22,11 +22,9 @@ freehandShape.prototype.draw = function() {
 freehandShape.prototype.hit = function(cursorPos) {
     for (var i = 0; i < this.posArray.length; i++){
         if ((this.posArray[i].x - 3 < cursorPos.x) && (cursorPos.x < this.posArray[i].x + 3) && (this.posArray[i].y - 3 < cursorPos.y) && (cursorPos.y < this.posArray[i].y + 3)){
-            alert(i);
             return true;
         //if in rectangle drawn upwards
         }else if ((this.posArray[i].x - 3 > cursorPos.x) && (cursorPos.x > this.posArray[i].x + 3) && (this.posArray[i].y - 3 > cursorPos.y) && (cursorPos.y > this.posArray[i].y + 3)){
-            alert(i);
             return true;
         }
     }
