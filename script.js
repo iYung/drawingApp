@@ -5,7 +5,10 @@ var del; var move; var copy; var group; var ungroup;
 //holds starting pos, index of a shape in the shapeArray, and if a shapehas been copied
 var startPos; var shapeIndex;
 
+//holds shapes
 var shapeArray = [];
+
+var undoArray = [];
 
 $(document).ready(function(){
     
@@ -55,42 +58,51 @@ $(document).ready(function(){
         //MAKING SHAPES
         //if shape is line, create line obj
         if (line) {
+            updateUndo();
             var newLine = new lineShape(colour,startPos,endPos);
             shapeArray.push(newLine);
         //if shape is rect
         } else if (rect) {
+            updateUndo();
             var newRect = new rectShape(colour,startPos,endPos);
             shapeArray.push(newRect);
         //if shape is square
         } else if (square) {
+            updateUndo();
             var newSquare = new squareShape(colour,startPos,endPos);
             shapeArray.push(newSquare);
         //if shape is circle and not negative
         } else if (circ && endPos.x > startPos.x && endPos.y > startPos.y) {
+            updateUndo();
             var newCirc = new circShape(colour,startPos,endPos);
             shapeArray.push(newCirc);
         //if shape is ellipse and not negative
         } else if (ellip && endPos.x > startPos.x && endPos.y > startPos.y) {
+            updateUndo();
             var newEllip = new ellipShape(colour,startPos,endPos);
             shapeArray.push(newEllip);
         //if shape is freehand
         } else if (freehand) {
+            updateUndo();
             shapeArray.push(freehandObj);
         //if in del mode
         } else if (del) {
             var objIndex = checkHit(getMousePos(canvas));
             if (objIndex != -1){
+                updateUndo();
                 shapeArray.splice(objIndex,1);
             }
         //if move mode
         } else if (move) {
             if (shapeIndex != -1) {
+                updateUndo();
                 var newPos = getMousePos(canvas);
                 shapeArray[shapeIndex].move(newPos.x - startPos.x, newPos.y - startPos.y);
             }
         //if copy mode, no shape selected
         } else if (copy) {
             if (shapeIndex != -1) {
+                updateUndo();
                 var newPos = getMousePos(canvas);
                 //clone shape without references to original shape
                 var newShape = jQuery.extend(true, {}, shapeArray[shapeIndex]);
@@ -102,6 +114,7 @@ $(document).ready(function(){
             //checks if both objects are valid
             var shapeIndex2 = checkHit(getMousePos(canvas));
             if ((shapeIndex != -1) && (shapeIndex2 != -1)) {
+                updateUndo();
                 var shape1, shape2;
                 shape1 = jQuery.extend(true, {}, shapeArray[shapeIndex]);
                 shapeArray.splice(shapeIndex,1);
@@ -116,6 +129,7 @@ $(document).ready(function(){
         } else if (ungroup) {
             //checks if shape is of type group
             if (shapeArray[shapeIndex].type == "group") {
+                updateUndo();
                 var newShape;
                 newShape = jQuery.extend(true, {}, shapeArray[shapeIndex].shapeArray[0]);
                 shapeArray.push(newShape);
@@ -192,7 +206,6 @@ $(document).ready(function(){
     });
     
     $('#load').mousedown(function(e) {
-        
         //get data from local storage and parse it
         var savedData = localStorage.getItem("save");
         var parsedData = JSON.parse(savedData);
@@ -200,6 +213,15 @@ $(document).ready(function(){
         //load the data and draw it
         shapeArray = load(parsedData);
         draw(canvas,cursor);
+    });
+    
+    $('#undo').mousedown(function(e) {
+        var oldState = undoArray.pop().slice();
+        shapeArray = oldState;
+        draw(canvas,cursor);
+    });
+    
+    $('#redo').mousedown(function(e) {
     });
     
     //COLOUR BUTTONS------------------------------
@@ -248,6 +270,7 @@ function checkHit(mousePos) {
     return -1;
 }
 
+//used for loading shapes from an array
 function load(parsedData) {
     
     var newShape;
@@ -289,4 +312,9 @@ function load(parsedData) {
     
     return array;
     
+}
+
+function updateUndo() {
+    var oldState = shapeArray.slice();
+    undoArray.push(oldState);
 }
