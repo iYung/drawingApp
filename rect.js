@@ -25,3 +25,10 @@ rectShape.prototype.hit = function(cursorPos) {
         return false;
     }
 }
+
+rectShape.prototype.move = function(shiftx,shifty) {
+    this.startPos.x += shiftx;
+    this.startPos.y += shifty;
+    this.endPos.x += shiftx;
+    this.endPos.y += shifty;
+}

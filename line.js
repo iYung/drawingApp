@@ -28,5 +28,12 @@ lineShape.prototype.hit = function(cursorPos) {
     }
 }
 
+lineShape.prototype.move = function(shiftx,shifty) {
+    this.startPos.x += shiftx;
+    this.startPos.y += shifty;
+    this.endPos.x += shiftx;
+    this.endPos.y += shifty;
+}
+
 
 

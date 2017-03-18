@@ -11,3 +11,6 @@ shape.prototype.draw = function(){
 
 shape.prototype.hit = function(cursorPos){
 }
+
+shape.prototype.move = function(shiftx,shifty){
+}

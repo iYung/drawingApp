@@ -31,3 +31,10 @@ freehandShape.prototype.hit = function(cursorPos) {
     //not this square
     return false;
 }
+
+freehandShape.prototype.move = function(shiftx,shifty) {
+    for (var i = 0; i < this.posArray.length; i++){
+        this.posArray[i].x += shiftx;
+        this.posArray[i].y += shifty;
+    }
+}

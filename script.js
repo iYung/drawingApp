@@ -1,13 +1,15 @@
 var canvas; var mousedown; var cursor; var colour;
-var freehand; var line; var rect; var square; var circ; var ellip; var del;
+var freehand; var line; var rect; var square; var circ; var ellip; var del; var move;
 var startPos;
+
+var shapeIndex;
 
 var shapeArray = [];
 
 $(document).ready(function(){
     
     canvas = document.getElementById("canvas");
-    freehand = false; line = false; rect = false; square = false; circ = false; ellip = false;
+    freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; move = false;
     mousedown = false; 
     colour = "#000000";
     cursor = canvas.getContext("2d");
@@ -19,14 +21,17 @@ $(document).ready(function(){
         //register that mouse is down
         mousedown = true;
         
-        //if shape is line, get starting coordinates
-        if (freehand || line || rect || square || circ || ellip) {
+        //get starting coordinates
+        if (freehand || line || rect || square || circ || ellip || move) {
             startPos = getMousePos(canvas);
         }
         
         //creates freehand object to feed new points into
         if (freehand) {
             freehandObj = new freehandShape(colour,cursor,startPos);
+        //gets object selected to move
+        } else if (move) {
+            shapeIndex = checkHit(getMousePos(canvas));
         }
         
     });
@@ -68,13 +73,19 @@ $(document).ready(function(){
             var newEllip = new ellipShape(colour,cursor,startPos,endPos);
             shapeArray.push(newEllip);
         //if shape is freehand
-        } else if (freehand){
+        } else if (freehand) {
             shapeArray.push(freehandObj);
         //if in del mode
-        } else if (del){
+        } else if (del) {
             var objIndex = checkHit(getMousePos(canvas));
             if (objIndex != -1){
                 shapeArray.splice(objIndex,1);
+            }
+        //if move mode
+        } else if (move) {
+            if (shapeIndex != -1) {
+                var newPos = getMousePos(canvas);
+                shapeArray[shapeIndex].move(newPos.x - startPos.x, newPos.y - startPos.y);
             }
         }
         
@@ -85,31 +96,43 @@ $(document).ready(function(){
     //MODE BUTTONS------------------------------
     
     $('#freehand').mousedown(function(e){
-        freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; del = false;
+        freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; 
+        del = false; move = false;
     });
     
     $('#line').mousedown(function(e) {
-        freehand = false; line = true; rect = false; square = false; circ = false; ellip = false; del = false;
+        freehand = false; line = true; rect = false; square = false; circ = false; ellip = false; 
+        del = false; move = false;
     });
     
     $('#rect').mousedown(function(e) {
-        freehand = false; line = false; rect = true; square = false; circ = false; ellip = false; del = false;
+        freehand = false; line = false; rect = true; square = false; circ = false; ellip = false; 
+        del = false; move = false;
     });
     
     $('#square').mousedown(function(e) {
-        freehand = false; line = false; rect = false; square = true; circ = false; ellip = false; del = false;
+        freehand = false; line = false; rect = false; square = true; circ = false; ellip = false; 
+        del = false; move = false;
     });
     
     $('#circ').mousedown(function(e) {
-        freehand = false; line = false; rect = false; square = false; circ = true; ellip = false; del = false;
+        freehand = false; line = false; rect = false; square = false; circ = true; ellip = false; 
+        del = false; move = false;
     });
     
     $('#ellip').mousedown(function(e) {
-        freehand = false; line = false; rect = false; square = false; circ = false; ellip = true; del = false;
+        freehand = false; line = false; rect = false; square = false; circ = false; ellip = true; 
+        del = false; move = false;
     });
     
     $('#del').mousedown(function(e) {
-        freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; del = true;
+        freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
+        del = true; move = false;
+    });
+    
+    $('#move').mousedown(function(e) {
+        freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
+        del = false; move = true;
     });
     
     //COLOUR BUTTONS------------------------------
