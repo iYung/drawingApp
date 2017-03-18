@@ -17,11 +17,15 @@ lineShape.prototype.draw = function() {
 };
 
 lineShape.prototype.hit = function(cursorPos) {
-    //checks if on line
-    if (Math.sqrt((cursorPos.x - this.startPos.x)^2 + (cursorPos.y - this.startPos.y)^2) + Math.sqrt((cursorPos.x - this.endPos.x)^2 + (cursorPos.y - this.endPos.y)^2) == Math.sqrt((this.endPos.x - this.startPos.x)^2 + (this.endPos.y - this.startPos.y)^2)){
+    
+    //gets cross product and checks if it is near cursor
+    var crossproduct = (cursorPos.y - this.startPos.y) * (this.endPos.x - this.startPos.x) - (cursorPos.x - this.startPos.x) * (this.endPos.y - this.startPos.y);
+    if ((Math.abs(crossproduct) < 2300)){
         return true;
+    //if it is far return false    
+    } else {
+        return false;
     }
-    return false; 
 }
 
 
