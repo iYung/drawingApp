@@ -1,8 +1,8 @@
 var canvas; var mousedown; var cursor; var colour;
-var freehand; var line; var rect; var square; var circ; var ellip; var del; var move;
-var startPos;
+var freehand; var line; var rect; var square; var circ; var ellip; var del; var move; var copy;
 
-var shapeIndex;
+//holds starting pos, index of a shape in the shapeArray, and if a shapehas been copied
+var startPos; var shapeIndex;
 
 var shapeArray = [];
 
@@ -10,7 +10,7 @@ $(document).ready(function(){
     
     canvas = document.getElementById("canvas");
     freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; move = false;
-    mousedown = false; 
+    mousedown = false; copy = false;
     colour = "#000000";
     cursor = canvas.getContext("2d");
     
@@ -22,7 +22,7 @@ $(document).ready(function(){
         mousedown = true;
         
         //get starting coordinates
-        if (freehand || line || rect || square || circ || ellip || move) {
+        if (freehand || line || rect || square || circ || ellip || move || copy) {
             startPos = getMousePos(canvas);
         }
         
@@ -30,8 +30,8 @@ $(document).ready(function(){
         if (freehand) {
             freehandObj = new freehandShape(colour,cursor,startPos);
         //gets object selected to move
-        } else if (move) {
-            shapeIndex = checkHit(getMousePos(canvas));
+        } else if (move || copy) {
+            shapeIndex = checkHit(startPos);
         }
         
     });
@@ -67,7 +67,7 @@ $(document).ready(function(){
         //if shape is circle and not negative
         } else if (circ && endPos.x > startPos.x && endPos.y > startPos.y) {
             var newCirc = new circShape(colour,cursor,startPos,endPos);
-            shapeArray.push(newCirc|| endPos.x > startPos.x || endPos.y > startPos.y);
+            shapeArray.push(newCirc);
         //if shape is ellipse and not negative
         } else if (ellip && endPos.x > startPos.x && endPos.y > startPos.y) {
             var newEllip = new ellipShape(colour,cursor,startPos,endPos);
@@ -87,6 +87,15 @@ $(document).ready(function(){
                 var newPos = getMousePos(canvas);
                 shapeArray[shapeIndex].move(newPos.x - startPos.x, newPos.y - startPos.y);
             }
+        //if copy mode, no shape selected
+        } else if (copy) {
+            if (shapeIndex != -1) {
+                var newPos = getMousePos(canvas);
+                //clone shape without references to original shape
+                var newShape = jQuery.extend(true, {}, shapeArray[shapeIndex]);
+                newShape.move(newPos.x - startPos.x, newPos.y - startPos.y);
+                shapeArray.push(newShape);
+            }
         }
         
         //draw everything
@@ -97,42 +106,47 @@ $(document).ready(function(){
     
     $('#freehand').mousedown(function(e){
         freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false;
+        del = false; move = false; copy = false; 
     });
     
     $('#line').mousedown(function(e) {
         freehand = false; line = true; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false;
+        del = false; move = false; copy = false;
     });
     
     $('#rect').mousedown(function(e) {
         freehand = false; line = false; rect = true; square = false; circ = false; ellip = false; 
-        del = false; move = false;
+        del = false; move = false; copy = false; 
     });
     
     $('#square').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = true; circ = false; ellip = false; 
-        del = false; move = false;
+        del = false; move = false; copy = false; 
     });
     
     $('#circ').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = true; ellip = false; 
-        del = false; move = false;
+        del = false; move = false; copy = false; 
     });
     
     $('#ellip').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = true; 
-        del = false; move = false;
+        del = false; move = false; copy = false; 
     });
     
     $('#del').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = true; move = false;
+        del = true; move = false; copy = false; 
     });
     
     $('#move').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = true;
+        del = false; move = true; copy = false; 
+    });
+    
+    $('#copy').mousedown(function(e) {
+        freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
+        del = false; move = false; copy = true; 
     });
     
     //COLOUR BUTTONS------------------------------

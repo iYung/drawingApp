@@ -20,7 +20,7 @@ lineShape.prototype.hit = function(cursorPos) {
     
     //gets cross product and checks if it is near cursor
     var crossproduct = (cursorPos.y - this.startPos.y) * (this.endPos.x - this.startPos.x) - (cursorPos.x - this.startPos.x) * (this.endPos.y - this.startPos.y);
-    if ((Math.abs(crossproduct) < 2300)){
+    if ((Math.abs(crossproduct) < 1800)){
         return true;
     //if it is far return false    
     } else {
