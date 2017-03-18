@@ -1,12 +1,11 @@
 //GENERIC
 
-function shape(colour, cursor,startPos) {
-    this.cursor = cursor;
+function shape(colour, startPos) {
     this.colour = colour;
     this.startPos = startPos;
 }
 
-shape.prototype.draw = function(){
+shape.prototype.draw = function(cursor){
 };
 
 shape.prototype.hit = function(cursorPos){

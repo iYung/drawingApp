@@ -28,7 +28,7 @@ $(document).ready(function(){
         
         //creates freehand object to feed new points into
         if (freehand) {
-            freehandObj = new freehandShape(colour,cursor,startPos);
+            freehandObj = new freehandShape(colour,startPos);
         //gets object selected to move
         } else if (move || copy) {
             shapeIndex = checkHit(startPos);
@@ -54,23 +54,23 @@ $(document).ready(function(){
         //MAKING SHAPES
         //if shape is line, create line obj
         if (line) {
-            var newLine = new lineShape(colour,cursor,startPos,endPos);
+            var newLine = new lineShape(colour,startPos,endPos);
             shapeArray.push(newLine);
         //if shape is rect
         } else if (rect) {
-            var newRect = new rectShape(colour,cursor,startPos,endPos);
+            var newRect = new rectShape(colour,startPos,endPos);
             shapeArray.push(newRect);
         //if shape is square
         } else if (square) {
-            var newSquare = new squareShape(colour,cursor,startPos,endPos);
+            var newSquare = new squareShape(colour,startPos,endPos);
             shapeArray.push(newSquare);
         //if shape is circle and not negative
         } else if (circ && endPos.x > startPos.x && endPos.y > startPos.y) {
-            var newCirc = new circShape(colour,cursor,startPos,endPos);
+            var newCirc = new circShape(colour,startPos,endPos);
             shapeArray.push(newCirc);
         //if shape is ellipse and not negative
         } else if (ellip && endPos.x > startPos.x && endPos.y > startPos.y) {
-            var newEllip = new ellipShape(colour,cursor,startPos,endPos);
+            var newEllip = new ellipShape(colour,startPos,endPos);
             shapeArray.push(newEllip);
         //if shape is freehand
         } else if (freehand) {
@@ -149,6 +149,46 @@ $(document).ready(function(){
         del = false; move = false; copy = true; 
     });
     
+    $('#save').mousedown(function(e) {
+        localStorage.setItem("save", JSON.stringify(shapeArray));
+    });
+    
+    $('#load').mousedown(function(e) {
+        var newShape;
+        var savedData = localStorage.getItem("save");
+        var parsedData = JSON.parse(savedData);
+        shapeArray = [];
+        for (var i = 0; i < parsedData.length; i++){
+            //if line
+            if (parsedData[i].type == "line") {
+                newShape = new lineShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+                shapeArray.push(newShape);
+            //if rectangle
+            } else if (parsedData[i].type == "rect") {
+                newShape = new rectShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+                shapeArray.push(newShape);
+            //square
+            } else if (parsedData[i].type == "square") {
+                newShape = new squareShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+                shapeArray.push(newShape);
+            //if circle
+            } else if (parsedData[i].type == "circ") {
+                newShape = new circShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+                shapeArray.push(newShape);
+            //if ellipse
+            } else if (parsedData[i].type == "ellip") {
+                newShape = new ellipShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+                shapeArray.push(newShape);
+            //if freehand
+            } else if (parsedData[i].type == "freehand") {
+                newShape = new freehandShape(parsedData[i].colour,parsedData[i].startPos);
+                newShape.addArray(parsedData[i].posArray);
+                shapeArray.push(newShape);
+            }
+        }
+        draw(canvas,cursor);
+    });
+    
     //COLOUR BUTTONS------------------------------
     
     $('#black').mousedown(function(e){
@@ -179,7 +219,7 @@ function getMousePos(canvas) {
 function draw(canvas,cursor) {
     cursor.clearRect(0, 0, canvas.width, canvas.height);
     for (var i = 0; i < shapeArray.length; i++){
-        shapeArray[i].draw();
+        shapeArray[i].draw(cursor);
     }
 }
 

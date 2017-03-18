@@ -1,5 +1,5 @@
-function squareShape(colour, cursor,startPos, endPos) {
-    this.cursor = cursor;
+function squareShape(colour, startPos, endPos) {
+    this.type = "square";
     this.colour=colour;
     this.startPos = startPos;
     this.endPos = endPos;
@@ -8,9 +8,9 @@ function squareShape(colour, cursor,startPos, endPos) {
 squareShape.prototype = Object.create(shape.prototype);
 squareShape.prototype.constructor = squareShape;
 
-squareShape.prototype.draw = function() {
-    this.cursor.fillStyle=this.colour;
-    this.cursor.fillRect(this.startPos.x,this.startPos.y,this.endPos.x - this.startPos.x,this.endPos.x - this.startPos.x);
+squareShape.prototype.draw = function(cursor) {
+    cursor.fillStyle=this.colour;
+    cursor.fillRect(this.startPos.x,this.startPos.y,this.endPos.x - this.startPos.x,this.endPos.x - this.startPos.x);
 };
 
 squareShape.prototype.hit = function(cursorPos) {

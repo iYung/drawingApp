@@ -1,5 +1,5 @@
-function freehandShape(colour, cursor,startPos) {
-    this.cursor = cursor;
+function freehandShape(colour, startPos) {
+    this.type = "freehand";
     this.colour = colour;
     this.posArray = [];
     this.posArray.push(startPos);
@@ -12,10 +12,14 @@ freehandShape.prototype.addPt = function(newPt) {
     this.posArray.push(newPt);
 }
 
-freehandShape.prototype.draw = function() {
-    this.cursor.fillStyle=this.colour;
+freehandShape.prototype.addArray = function(newArray) {
+    this.posArray = newArray;
+}
+
+freehandShape.prototype.draw = function(cursor) {
+    cursor.fillStyle=this.colour;
     for (var i = 0; i < this.posArray.length; i++){
-        this.cursor.fillRect(this.posArray[i].x - 3,this.posArray[i].y - 3,7,7);
+        cursor.fillRect(this.posArray[i].x - 3,this.posArray[i].y - 3,7,7);
     }
 };
 

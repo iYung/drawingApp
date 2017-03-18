@@ -1,5 +1,5 @@
-function lineShape(colour, cursor,startPos, endPos) {
-    this.cursor = cursor;
+function lineShape(colour, startPos, endPos) {
+    this.type = "line";
     this.colour=colour;
     this.startPos = startPos;
     this.endPos = endPos;
@@ -8,12 +8,12 @@ function lineShape(colour, cursor,startPos, endPos) {
 lineShape.prototype = Object.create(shape.prototype);
 lineShape.prototype.constructor = lineShape;
 
-lineShape.prototype.draw = function() {
-    this.cursor.beginPath();
-    this.cursor.moveTo(this.startPos.x,this.startPos.y);
-    this.cursor.lineTo(this.endPos.x,this.endPos.y);
-    this.cursor.strokeStyle = this.colour;
-    this.cursor.stroke();
+lineShape.prototype.draw = function(cursor) {
+    cursor.beginPath();
+    cursor.moveTo(this.startPos.x,this.startPos.y);
+    cursor.lineTo(this.endPos.x,this.endPos.y);
+    cursor.strokeStyle = this.colour;
+    cursor.stroke();
 };
 
 lineShape.prototype.hit = function(cursorPos) {
