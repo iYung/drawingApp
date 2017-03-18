@@ -1,5 +1,6 @@
 var canvas; var mousedown; var cursor; var colour;
-var freehand; var line; var rect; var square; var circ; var ellip; var del; var move; var copy; var group;
+var freehand; var line; var rect; var square; var circ; var ellip; 
+var del; var move; var copy; var group; var ungroup;
 
 //holds starting pos, index of a shape in the shapeArray, and if a shapehas been copied
 var startPos; var shapeIndex;
@@ -10,7 +11,7 @@ $(document).ready(function(){
     
     canvas = document.getElementById("canvas");
     freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; move = false;
-    mousedown = false; copy = false; group = false;
+    mousedown = false; copy = false; group = false; ungroup = false;
     colour = "#000000";
     cursor = canvas.getContext("2d");
     
@@ -22,7 +23,7 @@ $(document).ready(function(){
         mousedown = true;
         
         //get starting coordinates
-        if (freehand || line || rect || square || circ || ellip || move || copy || group) {
+        if (freehand || line || rect || square || circ || ellip || move || copy || group || ungroup) {
             startPos = getMousePos(canvas);
         }
         
@@ -30,7 +31,7 @@ $(document).ready(function(){
         if (freehand) {
             freehandObj = new freehandShape(colour,startPos);
         //gets object selected to move
-        } else if (move || copy || group) {
+        } else if (move || copy || group || ungroup) {
             shapeIndex = checkHit(startPos);
         }
         
@@ -100,7 +101,7 @@ $(document).ready(function(){
         } else if (group) {
             //checks if both objects are valid
             var shapeIndex2 = checkHit(getMousePos(canvas));
-            if ((shapeIndex != -1) || (shapeIndex2 != -1)) {
+            if ((shapeIndex != -1) && (shapeIndex2 != -1)) {
                 var shape1, shape2;
                 shape1 = jQuery.extend(true, {}, shapeArray[shapeIndex]);
                 shapeArray.splice(shapeIndex,1);
@@ -110,6 +111,17 @@ $(document).ready(function(){
                 shapeArray.splice(shapeIndex2,1);
                 var newGroup = new groupShape(shape1, shape2);
                 shapeArray.push(newGroup);
+            }
+        //ungroup mode
+        } else if (ungroup) {
+            //checks if shape is of type group
+            if (shapeArray[shapeIndex].type == "group") {
+                var newShape;
+                newShape = jQuery.extend(true, {}, shapeArray[shapeIndex].shapeArray[0]);
+                shapeArray.push(newShape);
+                newShape = jQuery.extend(true, {}, shapeArray[shapeIndex].shapeArray[1]);
+                shapeArray.push(newShape);
+                shapeArray.splice(shapeIndex,1);
             }
         }
         
@@ -121,52 +133,57 @@ $(document).ready(function(){
     
     $('#freehand').mousedown(function(e){
         freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = false; group = false;
+        del = false; move = false; copy = false; group = false; ungroup = false;
     });
     
     $('#line').mousedown(function(e) {
         freehand = false; line = true; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = false; group = false;
+        del = false; move = false; copy = false; group = false; ungroup = false;
     });
     
     $('#rect').mousedown(function(e) {
         freehand = false; line = false; rect = true; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = false; group = false; 
+        del = false; move = false; copy = false; group = false; ungroup = false;
     });
     
     $('#square').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = true; circ = false; ellip = false; 
-        del = false; move = false; copy = false; group = false; 
+        del = false; move = false; copy = false; group = false; ungroup = false;
     });
     
     $('#circ').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = true; ellip = false; 
-        del = false; move = false; copy = false; group = false;
+        del = false; move = false; copy = false; group = false; ungroup = false;
     });
     
     $('#ellip').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = true; 
-        del = false; move = false; copy = false; group = false;
+        del = false; move = false; copy = false; group = false; ungroup = false;
     });
     
     $('#del').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = true; move = false; copy = false; group = false; 
+        del = true; move = false; copy = false; group = false; ungroup = false;
     });
     
     $('#move').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = true; copy = false; group = false; 
+        del = false; move = true; copy = false; group = false; ungroup = false;
     });
     
     $('#copy').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = true; group = false; 
+        del = false; move = false; copy = true; group = false; ungroup = false;
     });
     
     $('#group').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = false; group = true; 
+        del = false; move = false; copy = false; group = true; ungroup = false;
+    });
+    
+    $('#ungroup').mousedown(function(e) {
+        freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
+        del = false; move = false; copy = false; group = false; ungroup = true;
     });
     
     $('#save').mousedown(function(e) {
