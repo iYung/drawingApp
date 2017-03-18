@@ -9,13 +9,16 @@ groupShape.prototype = Object.create(shape.prototype);
 groupShape.prototype.constructor = groupShape;
 
 groupShape.prototype.draw = function(cursor) {
-    this.shapeArray[0].draw();
-    this.shapeArray[1].draw();
+    this.shapeArray[0].draw(cursor);
+    this.shapeArray[1].draw(cursor);
 };
 
 groupShape.prototype.hit = function(cursorPos) {
-    this.shapeArray[0].hit(cursorPos);
-    this.shapeArray[1].hit(cursorPos);
+    if ((this.shapeArray[0].hit(cursorPos))||(this.shapeArray[1].hit(cursorPos))){
+        return true;
+    } else {
+        return false;
+    }
 };
 
 groupShape.prototype.move = function(shiftx,shifty) {

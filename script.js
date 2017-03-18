@@ -1,5 +1,5 @@
 var canvas; var mousedown; var cursor; var colour;
-var freehand; var line; var rect; var square; var circ; var ellip; var del; var move; var copy;
+var freehand; var line; var rect; var square; var circ; var ellip; var del; var move; var copy; var group;
 
 //holds starting pos, index of a shape in the shapeArray, and if a shapehas been copied
 var startPos; var shapeIndex;
@@ -10,7 +10,7 @@ $(document).ready(function(){
     
     canvas = document.getElementById("canvas");
     freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; move = false;
-    mousedown = false; copy = false;
+    mousedown = false; copy = false; group = false;
     colour = "#000000";
     cursor = canvas.getContext("2d");
     
@@ -22,7 +22,7 @@ $(document).ready(function(){
         mousedown = true;
         
         //get starting coordinates
-        if (freehand || line || rect || square || circ || ellip || move || copy) {
+        if (freehand || line || rect || square || circ || ellip || move || copy || group) {
             startPos = getMousePos(canvas);
         }
         
@@ -30,7 +30,7 @@ $(document).ready(function(){
         if (freehand) {
             freehandObj = new freehandShape(colour,startPos);
         //gets object selected to move
-        } else if (move || copy) {
+        } else if (move || copy || group) {
             shapeIndex = checkHit(startPos);
         }
         
@@ -96,6 +96,21 @@ $(document).ready(function(){
                 newShape.move(newPos.x - startPos.x, newPos.y - startPos.y);
                 shapeArray.push(newShape);
             }
+        //group mode
+        } else if (group) {
+            //checks if both objects are valid
+            var shapeIndex2 = checkHit(getMousePos(canvas));
+            if ((shapeIndex != -1) || (shapeIndex2 != -1)) {
+                var shape1, shape2;
+                shape1 = jQuery.extend(true, {}, shapeArray[shapeIndex]);
+                shapeArray.splice(shapeIndex,1);
+                //gets new index value of second shape
+                shapeIndex2 = checkHit(getMousePos(canvas));
+                shape2 = jQuery.extend(true, {}, shapeArray[shapeIndex2]);
+                shapeArray.splice(shapeIndex2,1);
+                var newGroup = new groupShape(shape1, shape2);
+                shapeArray.push(newGroup);
+            }
         }
         
         //draw everything
@@ -106,47 +121,52 @@ $(document).ready(function(){
     
     $('#freehand').mousedown(function(e){
         freehand = true; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = false; 
+        del = false; move = false; copy = false; group = false;
     });
     
     $('#line').mousedown(function(e) {
         freehand = false; line = true; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = false;
+        del = false; move = false; copy = false; group = false;
     });
     
     $('#rect').mousedown(function(e) {
         freehand = false; line = false; rect = true; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = false; 
+        del = false; move = false; copy = false; group = false; 
     });
     
     $('#square').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = true; circ = false; ellip = false; 
-        del = false; move = false; copy = false; 
+        del = false; move = false; copy = false; group = false; 
     });
     
     $('#circ').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = true; ellip = false; 
-        del = false; move = false; copy = false; 
+        del = false; move = false; copy = false; group = false;
     });
     
     $('#ellip').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = true; 
-        del = false; move = false; copy = false; 
+        del = false; move = false; copy = false; group = false;
     });
     
     $('#del').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = true; move = false; copy = false; 
+        del = true; move = false; copy = false; group = false; 
     });
     
     $('#move').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = true; copy = false; 
+        del = false; move = true; copy = false; group = false; 
     });
     
     $('#copy').mousedown(function(e) {
         freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
-        del = false; move = false; copy = true; 
+        del = false; move = false; copy = true; group = false; 
+    });
+    
+    $('#group').mousedown(function(e) {
+        freehand = false; line = false; rect = false; square = false; circ = false; ellip = false; 
+        del = false; move = false; copy = false; group = true; 
     });
     
     $('#save').mousedown(function(e) {
@@ -161,7 +181,7 @@ $(document).ready(function(){
         var parsedData = JSON.parse(savedData);
         
         //load the data and draw it
-        load(parsedData);
+        shapeArray = load(parsedData);
         draw(canvas,cursor);
     });
     
@@ -214,39 +234,42 @@ function checkHit(mousePos) {
 function load(parsedData) {
     
     var newShape;
-    shapeArray = [];
+    var array = [];
     for (var i = 0; i < parsedData.length; i++){
         //if line
         if (parsedData[i].type == "line") {
             newShape = new lineShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-            shapeArray.push(newShape);
+            array.push(newShape);
         //if rectangle
         } else if (parsedData[i].type == "rect") {
             newShape = new rectShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-            shapeArray.push(newShape);
+            array.push(newShape);
         //square
         } else if (parsedData[i].type == "square") {
             newShape = new squareShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-            shapeArray.push(newShape);
+            array.push(newShape);
         //if circle
         } else if (parsedData[i].type == "circ") {
             newShape = new circShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-            shapeArray.push(newShape);
+            array.push(newShape);
         //if ellipse
         } else if (parsedData[i].type == "ellip") {
             newShape = new ellipShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-            shapeArray.push(newShape);
+            array.push(newShape);
         //if freehand
         } else if (parsedData[i].type == "freehand") {
             newShape = new freehandShape(parsedData[i].colour,parsedData[i].startPos);
             newShape.addArray(parsedData[i].posArray);
-            shapeArray.push(newShape);
+            array.push(newShape);
         //grouped shape
         } else if (parsedData[i].type == "group") {
-            newShape = new freehandShape(parsedData[i].colour,parsedData[i].startPos);
-            newShape.addArray(parsedData[i].posArray);
-            shapeArray.push(newShape);
+            var loadedShapes = [];
+            loadedShapes = load(parsedData[i].shapeArray);
+            newShape = new groupShape(loadedShapes[0],loadedShapes[1]);
+            array.push(newShape);
         }
     }
+    
+    return array;
     
 }
