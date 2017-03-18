@@ -150,42 +150,18 @@ $(document).ready(function(){
     });
     
     $('#save').mousedown(function(e) {
+        //saves data as json
         localStorage.setItem("save", JSON.stringify(shapeArray));
     });
     
     $('#load').mousedown(function(e) {
-        var newShape;
+        
+        //get data from local storage and parse it
         var savedData = localStorage.getItem("save");
         var parsedData = JSON.parse(savedData);
-        shapeArray = [];
-        for (var i = 0; i < parsedData.length; i++){
-            //if line
-            if (parsedData[i].type == "line") {
-                newShape = new lineShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-                shapeArray.push(newShape);
-            //if rectangle
-            } else if (parsedData[i].type == "rect") {
-                newShape = new rectShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-                shapeArray.push(newShape);
-            //square
-            } else if (parsedData[i].type == "square") {
-                newShape = new squareShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-                shapeArray.push(newShape);
-            //if circle
-            } else if (parsedData[i].type == "circ") {
-                newShape = new circShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-                shapeArray.push(newShape);
-            //if ellipse
-            } else if (parsedData[i].type == "ellip") {
-                newShape = new ellipShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
-                shapeArray.push(newShape);
-            //if freehand
-            } else if (parsedData[i].type == "freehand") {
-                newShape = new freehandShape(parsedData[i].colour,parsedData[i].startPos);
-                newShape.addArray(parsedData[i].posArray);
-                shapeArray.push(newShape);
-            }
-        }
+        
+        //load the data and draw it
+        load(parsedData);
         draw(canvas,cursor);
     });
     
@@ -224,7 +200,7 @@ function draw(canvas,cursor) {
 }
 
 //checks if mouse is over object
-function checkHit(mousePos){
+function checkHit(mousePos) {
     //returns index of hovered obj
     for (var i = shapeArray.length - 1; i > -1; i--){
         if (shapeArray[i].hit(mousePos)){
@@ -233,4 +209,44 @@ function checkHit(mousePos){
     }
     //returns if there is nothing
     return -1;
+}
+
+function load(parsedData) {
+    
+    var newShape;
+    shapeArray = [];
+    for (var i = 0; i < parsedData.length; i++){
+        //if line
+        if (parsedData[i].type == "line") {
+            newShape = new lineShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+            shapeArray.push(newShape);
+        //if rectangle
+        } else if (parsedData[i].type == "rect") {
+            newShape = new rectShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+            shapeArray.push(newShape);
+        //square
+        } else if (parsedData[i].type == "square") {
+            newShape = new squareShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+            shapeArray.push(newShape);
+        //if circle
+        } else if (parsedData[i].type == "circ") {
+            newShape = new circShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+            shapeArray.push(newShape);
+        //if ellipse
+        } else if (parsedData[i].type == "ellip") {
+            newShape = new ellipShape(parsedData[i].colour,parsedData[i].startPos,parsedData[i].endPos);
+            shapeArray.push(newShape);
+        //if freehand
+        } else if (parsedData[i].type == "freehand") {
+            newShape = new freehandShape(parsedData[i].colour,parsedData[i].startPos);
+            newShape.addArray(parsedData[i].posArray);
+            shapeArray.push(newShape);
+        //grouped shape
+        } else if (parsedData[i].type == "group") {
+            newShape = new freehandShape(parsedData[i].colour,parsedData[i].startPos);
+            newShape.addArray(parsedData[i].posArray);
+            shapeArray.push(newShape);
+        }
+    }
+    
 }
