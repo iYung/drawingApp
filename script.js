@@ -9,6 +9,7 @@ var startPos; var shapeIndex;
 var shapeArray = [];
 
 var undoArray = [];
+var redoArray = [];
 
 $(document).ready(function(){
     
@@ -217,11 +218,18 @@ $(document).ready(function(){
     
     $('#undo').mousedown(function(e) {
         var oldState = undoArray.pop().slice();
+        var currState = shapeArray.slice();
+        redoArray.push(currState);
         shapeArray = oldState;
         draw(canvas,cursor);
     });
     
     $('#redo').mousedown(function(e) {
+        var oldState = redoArray.pop().slice();
+        var currState = shapeArray.slice();
+        undoArray.push(currState);
+        shapeArray = oldState;
+        draw(canvas,cursor);
     });
     
     //COLOUR BUTTONS------------------------------
@@ -317,4 +325,5 @@ function load(parsedData) {
 function updateUndo() {
     var oldState = shapeArray.slice();
     undoArray.push(oldState);
+    redoArray = [];
 }
