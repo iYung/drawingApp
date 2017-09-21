@@ -20,6 +20,7 @@ $(document).ready(function(){
     cursor = canvas.getContext("2d");
     
     var freehandObj;
+    var newPos;
   
     $('#canvas').mousedown(function(e){
         
@@ -36,15 +37,64 @@ $(document).ready(function(){
             freehandObj = new freehandShape(colour,startPos);
         //gets object selected to move
         } else if (move || copy || group || ungroup) {
+            updateUndo();
             shapeIndex = checkHit(startPos);
+            if (move && shapeIndex > -1) {
+                newPos = getMousePos(canvas);
+            }
         }
         
     });
     
     $('#canvas').mousemove(function(e){
         //add point to freehand object
-        if(freehand && mousedown) {
-            freehandObj.addPt(getMousePos(canvas));
+        if(mousedown) {
+            //get mouse end point
+            var endPos = getMousePos(canvas);
+            
+            var circIf = circ && endPos.x > startPos.x && endPos.y > startPos.y;
+            var ellipIf = ellip && endPos.x > startPos.x && endPos.y > startPos.y;
+            
+            //MAKING SHAPES
+            //if shape is line, create line obj
+            if (line) {
+                var newLine = new lineShape(colour,startPos,endPos);
+                shapeArray.push(newLine);
+            //if shape is rect
+            } else if (rect) {
+                var newRect = new rectShape(colour,startPos,endPos);
+                shapeArray.push(newRect);
+            //if shape is square
+            } else if (square) {
+                var newSquare = new squareShape(colour,startPos,endPos);
+                shapeArray.push(newSquare);
+            //if shape is circle and not negative
+            } else if (circIf) {
+                var newCirc = new circShape(colour,startPos,endPos);
+                shapeArray.push(newCirc);
+            //if shape is ellipse and not negative
+            } else if (ellipIf) {
+                var newEllip = new ellipShape(colour,startPos,endPos);
+                shapeArray.push(newEllip);
+            //if shape is freehand
+            } else if (freehand) {
+                freehandObj.addPt(getMousePos(canvas));
+                shapeArray.push(freehandObj);
+            //if move mode
+            } else if (move) {
+                if (shapeIndex != -1) {
+                    var prevPos = newPos;
+                    newPos = getMousePos(canvas);
+                    shapeArray[shapeIndex] = $.extend(true, [], shapeArray[shapeIndex]);
+                    shapeArray[shapeIndex].move(newPos.x - prevPos.x, newPos.y - prevPos.y);
+                }
+            }
+            
+            draw(canvas,cursor);
+            if ( line || rect || square || circIf || ellipIf || freehand) {
+                shapeArray.splice(shapeArray.length-1,1);
+            }
+            
         }
     });
     
@@ -92,13 +142,6 @@ $(document).ready(function(){
             if (objIndex != -1){
                 updateUndo();
                 shapeArray.splice(objIndex,1);
-            }
-        //if move mode
-        } else if (move) {
-            if (shapeIndex != -1) {
-                updateUndo();
-                var newPos = getMousePos(canvas);
-                shapeArray[shapeIndex].move(newPos.x - startPos.x, newPos.y - startPos.y);
             }
         //if copy mode, no shape selected
         } else if (copy) {
@@ -217,8 +260,8 @@ $(document).ready(function(){
     });
     
     $('#undo').mousedown(function(e) {
-        var oldState = undoArray.pop().slice();
-        var currState = shapeArray.slice();
+        var oldState = $.extend(true, [], undoArray.pop());
+        var currState = $.extend(true, [], shapeArray);
         redoArray.push(currState);
         shapeArray = oldState;
         draw(canvas,cursor);
@@ -323,7 +366,7 @@ function load(parsedData) {
 }
 
 function updateUndo() {
-    var oldState = shapeArray.slice();
+    var oldState = $.extend(true, [], shapeArray);
     undoArray.push(oldState);
     redoArray = [];
 }
